@@ -1,0 +1,35 @@
+---
+title: "Midterm"
+author: "Nathan Weitershausen"
+format: html
+editor: visual
+embed-resources: true
+---
+
+# Introduction
+
+Since moving to Los Angeles for graduate school, a common thing I have heard is that "LA was better" before the pandemic and that "tons" of businesses closed as a result of the pandemic. While I believe this can be said for almost every city in the world, I wanted to explore just how impactful the pandemic really was for Los Angeles-based businesses, using the "Listing of All Businesses" dataset from the Los Angeles Office of Finance. This dataset contains all active and inactive registered business locations, with "active" being defined as a business whose owner has not notified the Office of Finance of a cease of operations. The dataset contains relevant variables such as location, location start and end date, council district, and the North American Industry Classification System (NAICS) description. The primary question I will try to answer with this dataset is: How did the monthly number of business-location closures in Los Angeles change during the COVID-19 pandemic (March 2020-May 2023) compared with the pre-pandemic period? A follow-up quiestion that I will explore later is: Which industries experienced the greatest changes in closure frequency during the pandemic?
+
+The time range for the pandemic was defined as March 2020 to May 2023 based on these references:
+
+1.  https://www.cdc.gov/museum/timeline/covid19.html
+2.  https://www.who.int/news/item/05-05-2023-statement-on-the-fifteenth-meeting-of-the-international-health-regulations-(2005)-emergency-committee-regarding-the-coronavirus-disease-(covid-19)-pandemic
+
+# Data Preparation
+
+The "Listing of All Businesses" dataset was obtained from the City of Los Angeles Open Data Portal and is maintained by the Los Angeles Office of Finance (https://data.lacity.org/Administration-Finance/Listing-of-All-Businesses/r4uk-afju/about_data). Because the primary quiestion is focused on business-location closures, observations without a location end date were classified as active and excluded. Variables that are not needed to answer the primary qustion, such as "mailing address" and "location description" were also removed. Dates were converted into R date objects as well.
+
+```{r}
+All_Businesses <- read.csv("C:/Users/nweit/Downloads/Listing_of_All_Businesses_20261015.csv")
+
+All_Businesses$LOCATION.START.DATE <- as.Date(All_Businesses$LOCATION.START.DATE, format = "%m/%d/%Y")
+All_Businesses$LOCATION.END.DATE <- as.Date(All_Businesses$LOCATION.END.DATE, format = "%m/%d/%Y")
+
+Closures <- All_Businesses[!is.na(All_Businesses$LOCATION.END.DATE),]
+```
+
+# Exploratory Analysis
+
+# Preliminary Results
+
+# Conclusion
