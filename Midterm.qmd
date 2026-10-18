@@ -8,7 +8,7 @@ embed-resources: true
 
 # Introduction
 
-Since moving to Los Angeles for graduate school, a common thing I have heard is that "LA used to be better" because "tons" of businesses closed as a result of the pandemic. While I believe this can be said for almost every city in the world, I wanted to explore just how impactful the pandemic really was for Los Angeles-based businesses, using the "Listing of All Businesses" dataset from the Los Angeles Office of Finance. This dataset contains all active and inactive registered business locations, with "active" being defined as a business whose owner has not notified the Office of Finance of a cease of operations. The dataset contains relevant variables such as location, location start and end date, council district, and the North American Industry Classification System (NAICS) description. The primary question I will try to answer with this dataset is: How did the  number of business-location closures in Los Angeles change during the COVID-19 pandemic (March 11, 2020 - May 5,2023) compared with the pre-pandemic and post-pandemic periods? A follow-up quiestion that I will explore later is: Which industries experienced the greatest changes in closure frequency during the pandemic?
+Since moving to Los Angeles for graduate school, I frequently heard people claim that "Los Angeles used to be better" because many businesses closed during the COVID-19 pandemic. Though this can most likely be said about any city throughout the world, this claim pushed me to examine how business closures-location closures change in Los Angeles. This analysis will use the "Listing of All Businesses" dataset from the Los Angeles Office of Finance, which was obtained from the City of Los Angeles Open Data Portal. This dataset contains all active and inactive registered business locations, with "active" being defined as a business whose owner has not notified the Office of Finance of a cease of operations. The dataset contains relevant variables such as location, location start and end date, council district, and the North American Industry Classification System (NAICS) codes and description. The primary question I will try to answer with this dataset is: How did the number of business-location closures in Los Angeles change during the COVID-19 pandemic (March 11, 2020 - May 5,2023) compared with pre-pandemic and post-pandemic periods? A follow-up question that I will explore later is: Which industries experienced the greatest changes in closure frequency during the pandemic? Other potential follow-up questions will be addressed in the Preliminary Results section.
 
 The time range for the pandemic was defined as March 11, 2020 to May 5, 2023 based on these references:
 
@@ -54,7 +54,7 @@ Closures_Adjusted <- Closures[Closures$LOCATION.END.DATE >= as.Date("2017-01-15"
 
 # Exploratory Analysis
 
-For the Exploratory Analysis, I will be using both the "Closures" and "Closures_Adjusted" data frames. "Closures" includes all records dating back to 1977 and "Closures_Adjusted" includes all records dating back to December 10, 2016. For each visualization, "Historic Data" will refer to the "Closures" data frame and "Adjusted Data" will refer to the "Closures_Adjusted" data frame.
+For the Exploratory Analysis, I will be using both the "Closures" and "Closures_Adjusted" data frames. "Closures" includes all records from November 14, 1977 and October 15, 2026. "Closures_Adjusted" includes all records from January 15, 2017 and June 29, 2026. For each visualization, "Historic Data" will refer to the "Closures" data frame and "Adjusted Data" will refer to the "Closures_Adjusted" data frame.
 
 ```{r}
 library(knitr)
@@ -64,7 +64,7 @@ Missing_Industry <- is.na(Closures$PRIMARY.NAICS.DESCRIPTION) | trimws(Closures$
 Missing_Location <- is.na(Closures$LOCATION) | trimws(Closures$LOCATION) == ""
 Missing_NAICS <- is.na(Closures$NAICS) | trimws(Closures$NAICS) == ""
 
-Table <- data.frame(Characteristic = c("Business-Location Closures", "Earliest Closure Date", "Latest Closure Date", "Unique Location Accounts", "Missing NAICS Codes", "Missing Industry Descriptions", "Missing Locations"), Value = c(format(nrow(Closures), big.mark = ","), format(min(Closures$LOCATION.END.DATE, na.rm = TRUE)), format(max(Closures$LOCATION.END.DATE, na.rm = TRUE)), format(length(unique(Closures$LOCATION.ACCOUNT..)), big.mark = ","), format(sum(Missing_NAICS), big.mark = ","), format(sum(Missing_Industry), big.mark = ","), format(sum(Missing_Location), big.mark = ",")))
+Table <- data.frame(Characteristic = c("Business-Location Closures", "Earliest Closure Date", "Latest Closure Date", "Unique Location Accounts", "Unique Business Name", "Missing NAICS Codes", "Missing Industry Descriptions", "Missing Locations"), Value = c(format(nrow(Closures), big.mark = ","), format(min(Closures$LOCATION.END.DATE, na.rm = TRUE)), format(max(Closures$LOCATION.END.DATE, na.rm = TRUE)), format(length(unique(Closures$LOCATION.ACCOUNT..)), big.mark = ","), format(length(unique(Closures$BUSINESS.NAME)), big.mark = ","), paste0(format(sum(Missing_Industry),big.mark = ",")," (",round(100 * mean(Missing_Industry),1),"%)"),paste0(format(sum(Missing_Location),big.mark = ",")," (",round(100 * mean(Missing_Location),1),"%)"),paste0(format(sum(Missing_NAICS),big.mark = ",")," (",round(100 * mean(Missing_NAICS),1),"%)")))
 
 knitr::kable(Table, col.names = c("Dataset Characteristic", "Value"), caption = "Business-Closure Characterisitcs (Historic Data)")
 
@@ -73,25 +73,17 @@ Missing_Industry <- is.na(Closures_Adjusted$PRIMARY.NAICS.DESCRIPTION) | trimws(
 Missing_Location <- is.na(Closures_Adjusted$LOCATION) | trimws(Closures_Adjusted$LOCATION) == ""
 Missing_NAICS <- is.na(Closures_Adjusted$NAICS) | trimws(Closures_Adjusted$NAICS) == ""
 
-Table <- data.frame(Characteristic = c("Business-Location Closures", "Earliest Closure Date", "Latest Closure Date", "Unique Location Accounts", "Missing NAICS Codes", "Missing Industry Descriptions", "Missing Locations"), Value = c(format(nrow(Closures_Adjusted), big.mark = ","), format(min(Closures_Adjusted$LOCATION.END.DATE, na.rm = TRUE)), format(max(Closures_Adjusted$LOCATION.END.DATE, na.rm = TRUE)), format(length(unique(Closures_Adjusted$LOCATION.ACCOUNT..)), big.mark = ","), format(sum(Missing_NAICS), big.mark = ","), format(sum(Missing_Industry), big.mark = ","), format(sum(Missing_Location), big.mark = ",")))
+Table <- data.frame(Characteristic = c("Business-Location Closures", "Earliest Closure Date", "Latest Closure Date", "Unique Location Accounts", "Unique Business Name", "Missing NAICS Codes", "Missing Industry Descriptions", "Missing Locations"), Value = c(format(nrow(Closures_Adjusted), big.mark = ","), format(min(Closures_Adjusted$LOCATION.END.DATE, na.rm = TRUE)), format(max(Closures_Adjusted$LOCATION.END.DATE, na.rm = TRUE)), format(length(unique(Closures_Adjusted$LOCATION.ACCOUNT..)), big.mark = ","), format(length(unique(Closures_Adjusted$BUSINESS.NAME)), big.mark = ","), paste0(format(sum(Missing_Industry),big.mark = ",")," (",round(100 * mean(Missing_Industry),1),"%)"),paste0(format(sum(Missing_Location),big.mark = ",")," (",round(100 * mean(Missing_Location),1),"%)"),paste0(format(sum(Missing_NAICS),big.mark = ",")," (",round(100 * mean(Missing_NAICS),1),"%)")))
 
 knitr::kable(Table, col.names = c("Dataset Characteristic", "Value"), caption = "Business-Closure Characterisitcs (Adjusted Data)")
 
 ```
 
-```{r}
-# Closures by Period (Historic Data)
-Period_Count <- as.data.frame(table(Closures$Period))
-names(Period_Count) <- c("Period","Closures")
-Period_Count$Percentage <- round(100*Period_Count$Closures / sum(Period_Count$Closures),1)
-knitr::kable(Period_Count, col.names = c("Period", "Closures", "Percentage"), caption = "Business-Location Closures by Period (Historic Data)")
+## Explanation
 
-# Closures by Period (Adjusted Data)
-Period_Count <- as.data.frame(table(Closures_Adjusted$Period))
-names(Period_Count) <- c("Period","Closures")
-Period_Count$Percentage <- round(100*Period_Count$Closures / sum(Period_Count$Closures),1)
-knitr::kable(Period_Count, col.names = c("Period", "Closures", "Percentage"), caption = "Business-Location Closures by Period (Adjusted Data)")
-```
+The Historic Data table reveals that there were a total of 648,537 closures between November 14, 1977 and October 14, 2026, which was the latest closure at the time this data was downloaded. Given that each business location gets a unique location account, it makes sense that the Unique Location Accounts matches the Business-Location Closures. Businesses can register for different locations, so of the 648,537 closures, 590,840 had unique business names. 99% of the NAICS Codes, Industry Descriptions, and Locations were missing. 
+
+The Adjusted Data table reveals that there were a total of 234,761 closures between January 15, 2017 and June 29, 2026. Again, given that each business location gets a unique location account, it makes sense that the Unique Location Accounts matches the Business-Location Closures. Businesses can register for different locations, so of the 234,761 closures, 221,091 had unique business names. 98.7% of the NAICS Codes, Industry Descriptions, and Locations were missing. 
 
 ```{r}
 # Closures by Year (Historic Data)
@@ -104,7 +96,7 @@ All_Years <- seq(min(Closures$Closure.Year, na.rm = TRUE), max(Closures$Closure.
 Yearly_Closures <- data.frame(Year = All_Years, Closures = as.numeric(Year_Count[as.character(All_Years)]))
 
 par(mar = c(7,5,4,2) + 0.1)
-barplot(Yearly_Closures$Closures, names.arg = Yearly_Closures$Year, las = 2, border = NA, cex.names = 0.6, col = "blue", xlab = "Closure Year", ylab = "Number of Closures", main = "Business-Location Closures by Year (Historic Data)", sub = "Note: 2026 is an Incomplete Year. 2026 ends on October 15, 2026.")
+barplot(Yearly_Closures$Closures, names.arg = Yearly_Closures$Year, las = 2, border = NA, cex.names = 0.6, col = "blue", xlab = "Closure Year", ylab = "Number of Closures", main = "Business-Location Closures by Year (Historic Data)", sub = "Note: 1977 and 2026 are Incomplete Years.")
 
 # Closures by Year (Adjusted Data)
 Yearly_Closures <- as.data.frame(table(Closures_Adjusted$Closure.Year))
@@ -115,8 +107,13 @@ Year_Count <- table(Closures_Adjusted$Closure.Year)
 All_Years <- seq(min(Closures_Adjusted$Closure.Year, na.rm = TRUE), max(Closures_Adjusted$Closure.Year, na.rm = TRUE))
 Yearly_Closures <- data.frame(Year = All_Years, Closures = as.numeric(Year_Count[as.character(All_Years)]))
 
-barplot(Yearly_Closures$Closures, names.arg = Yearly_Closures$Year, las = 2, col = "blue", xlab = "Closure Year", ylab = "Number of Closures", main = "Business-Location Closures by Year (Adjusted Data)", sub = "Note: 2016 and 2026 are Incomplete Years. 2016 begins on December 17, 2016 and 2026 ends on October 15, 2026.")
+barplot(Yearly_Closures$Closures, names.arg = Yearly_Closures$Year, las = 2, col = "blue", xlab = "Closure Year", ylab = "Number of Closures", main = "Business-Location Closures by Year (Adjusted Data)", sub = "Note: 2017 and 2026 are Incomplete Years.")
 ```
+## Explanation
+
+The historic annual distribution indicates that closure data before the 2000's are relatively sparse. Prominent peaks in closures occurred in 2004, 2013, and 2017, which may warrant further investigation. As the plot states, 1977 and 2026 are incomplete years, so the number of closures they have should not be compared directly with the number of closures of complete years. 
+
+The adjusted annual distribution focuses on the equal length Pre-Pandemic, Pandemic, and Post-Pandemic periods. Because the plot is showing closures by year, the periods overlap within 2020 and 2023. The prominent peak in 2017 is still present, but as noted, 2017 and 2026 are incomplete years. The number of closures in these years should not be compared directly with the number of closures of complete years.
 
 ```{r}
 # Closures by Month (Historic Data)
@@ -144,12 +141,41 @@ abline(v = as.Date("2023-05-05"),col = "red")
 legend("topright", legend = c("Monthly Closures", "Pandemic Begins", "Pandemic Ends"), col = c("blue", "red", "red"), lty = c(1,2,1), lwd = 1)
 ```
 
+## Explanation
+
+The historic monthly distribution is similar to that of the historic annual distribution, in that data before the 2000's is relatively sparse. There are more pronounced peaks, with the most notable being in between November 2001 and November 2007
+
+
+
+
+# Preliminary Results
+
+Primary Question: How did the number of business-location closures in Los Angeles change during the COVID-19 pandemic (March 11, 2020 - May 5,2023) compared with the pre-pandemic and post-pandemic periods?
+
 ```{r}
+# Closures by Period (Historic Data)
+Period_Count <- as.data.frame(table(Closures$Period))
+names(Period_Count) <- c("Period","Closures")
+Period_Count$Percentage <- round(100*Period_Count$Closures / sum(Period_Count$Closures),1)
+knitr::kable(Period_Count, col.names = c("Period", "Closures", "Percentage"), caption = "Business-Location Closures by Period (Historic Data)")
+
+# Closures by Period (Adjusted Data)
+Period_Count <- as.data.frame(table(Closures_Adjusted$Period))
+names(Period_Count) <- c("Period","Closures")
+Period_Count$Percentage <- round(100*Period_Count$Closures / sum(Period_Count$Closures),1)
+knitr::kable(Period_Count, col.names = c("Period", "Closures", "Percentage"), caption = "Business-Location Closures by Period (Adjusted Data)")
+```
+
+## Explanation
+
+The Historic Data table reveals that 78.8% of closures occurred during the Pre-Pandemic period, 10.3% happened during the Pandemic, and 10.8% happened Post-Pandemic. The Adjusted Data table reveals that 43.0% of closures occurred during the Pre-Pandemic period, 28.5% happened during the Pandemic, and 28.5% happened Post-Pandemic.
+
+```{r period-summary, echo=FALSE, message=FALSE, warning=FALSE}
 Complete_Periods <- Closures_Adjusted
 Period_Totals <- as.data.frame(table(Complete_Periods$Period))
 names(Period_Totals) <- c("Period", "Total_Closures")
 Period_Totals$Mean_Daily_Closures <- Period_Totals$Total_Closures / 1151
-knitr::kable(Period_Totals, col.names = c("Period", "Total Closures", "Mean Daily Closures"), caption = "Business-Location Closures by Period")
+knitr::kable(Period_Totals, col.names = c("Period", "Total Closures", "Mean Daily Closures"), caption = "Business-Location Closures by Period (Adjusted Data)")
 
 Monthly_Closures <- aggregate(rep(1,nrow(Complete_Periods)), by=list(Closures_Periods = Complete_Periods$Closure.Month.Date, Period = Complete_Periods$Period), FUN = sum)
 names(Monthly_Closures)[3] <- "Closures"
@@ -172,9 +198,9 @@ Period_Summary$Months <- as.numeric(table(Monthly_Closures$Period)[Period_Summar
 
 Period_Summary <- Period_Summary[,c("Period", "Mean", "Median", "SD", "Minimum", "Maximum")]
 
-knitr::kable(Period_Summary, digits = 1, col.names = c("Period", "Mean", "Median", "Standard Deviation", "Minimum", "Maximum"),caption = "Monthly Business-Location Closures by Period")
+knitr::kable(Period_Summary, digits = 1, col.names = c("Period", "Mean", "Median", "Standard Deviation", "Minimum", "Maximum"),caption = "Monthly Business-Location Closures by Period (Adjusted Data)")
 
-boxplot(Closures ~ Period, data = Monthly_Closures, col = c("blue", "red", "green"), border = "gray", xlab = "Period", ylab = "Monthly Closures", main = "Distribuition of Monthly Closures by Period")
+boxplot(Closures ~ Period, data = Monthly_Closures, col = c("blue", "red", "green"), border = "gray", xlab = "Period", ylab = "Monthly Closures", main = "Distribuition of Monthly Closures by Period (Adjusted Data)")
 ```
 
 ```{r}
@@ -183,11 +209,5 @@ Largest_Month$Month <- format(Largest_Month$Closures_Periods, "%Y")
 Largest_Month <- Largest_Month[,c("Month","Closures")]
 knitr::kable(Largest_Month, col.names = c("Month", "Number of Closures"), caption = "Month with the Largest Number of Business-Location Closures")
 ```
-
-# Preliminary Results
-
-Primary Question: How did the number of business-location closures in Los Angeles change during the COVID-19 pandemic (March 11, 2020 - May 5,2023) compared with the pre-pandemic and post-pandemic periods?
-
-The historic data reveals that, after data-cleaning, 648,537 businesses closed from November 14, 1977 and October 14, 2026, with 78.8% (511,350) of those closures occurring before the Pandemic. 10.3% (66,986) occurred during the Pandemic and 10.8% (70,201) occurred after the Pandemic. The year with the largest number of closures appears to be 2013. The month with the largest number of closures
 
 # Conclusion
