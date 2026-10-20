@@ -224,52 +224,107 @@ Industry_Counts <- as.data.frame.matrix(xtabs(~ PRIMARY.NAICS.DESCRIPTION + Peri
 Industry_Counts$Industry <- rownames(Industry_Counts)
 rownames(Industry_Counts) <- NULL
 
+# Pre- vs Pandemic Table
 Industry_Counts$Pre_vs_Pandemic_Difference <- Industry_Counts$Pandemic - Industry_Counts$`Pre-Pandemic`
 
 Industry_Counts$Pre_vs_Pandemic_Percent <- ifelse(Industry_Counts$`Pre-Pandemic` > 0, 100 * ( Industry_Counts$Pandemic / Industry_Counts$`Pre-Pandemic` - 1), NA)
 
+Largest_Pre_vs_Pandemic <- Industry_Counts[order(abs(Industry_Counts$Pre_vs_Pandemic_Difference), decreasing = TRUE),]
+Largest_Pre_vs_Pandemic <- head(Largest_Pre_vs_Pandemic,10)
+Largest_Pre_vs_Pandemic <- Largest_Pre_vs_Pandemic[, c("Industry","Pre-Pandemic","Pandemic","Pre_vs_Pandemic_Difference","Pre_vs_Pandemic_Percent")]
+
+knitr::kable(Largest_Pre_vs_Pandemic, digits = 1, col.names = c("Industry", "Pre-Pandemic Closures", "Pandemic Closures", "Difference","Percent Change"), format.args = list(big.mark = ","), caption = paste("Industries with the Largest Changes in Closures from Pre-Pandemic to Pandemic"), row.names = FALSE)
+
+# Pandemic vs Post- Table
 Industry_Counts$Pandemic_vs_Post_Difference <- Industry_Counts$`Post-Pandemic` - Industry_Counts$Pandemic
 
 Industry_Counts$Pandemic_vs_Post_Percent <- ifelse(Industry_Counts$Pandemic > 0, 100 * ( Industry_Counts$`Post-Pandemic` / Industry_Counts$Pandemic - 1), NA)
 
-# Pre- vs Pandemic Table
-Largest_Pre_vs_Pandemic <- Industry_Counts[order(abs(Industry_Counts$Pre_vs_Pandemic_Difference), decreasing = TRUE),]
-Largest_Pre_vs_Pandemic <- head(Largest_Pre_vs_Pandemic,10)
-Largest_Pre_vs_Pandemic <- Largest_Pre_vs_Pandemic[, c("Industry","Pre-Pandemic","Pandemic","Post-Pandemic","Pre_vs_Pandemic_Difference","Pre_vs_Pandemic_Percent")]
-
-knitr::kable(Largest_Pre_vs_Pandemic, digits = 1, col.names = c("Industry", "Pre-Pandemic Closures", "Pandemic Closures", "Post-Pandemic Closures","Difference","Percent Change"), format.args = list(big.mark = ","), caption = paste("Industries with the Largest Changes in Closures from Pre-Pandemic to Pandemic"), row.names = FALSE)
-
-# Pandemic vs Post- Table
 Largest_Pandemic_vs_Post <- Industry_Counts[order(abs(Industry_Counts$Pandemic_vs_Post_Difference), decreasing = TRUE),]
 Largest_Pandemic_vs_Post <- head(Largest_Pandemic_vs_Post,10)
-Largest_Pandemic_vs_Post <- Largest_Pandemic_vs_Post[, c("Industry","Pre-Pandemic","Pandemic","Post-Pandemic","Pandemic_vs_Post_Difference","Pandemic_vs_Post_Percent")]
+Largest_Pandemic_vs_Post <- Largest_Pandemic_vs_Post[, c("Industry","Pandemic","Post-Pandemic","Pandemic_vs_Post_Difference","Pandemic_vs_Post_Percent")]
 
-knitr::kable(Largest_Pandemic_vs_Post, digits = 1, col.names = c("Industry", "Pre-Pandemic Closures", "Pandemic Closures", "Post-Pandemic Closures","Difference","Percent Change"), format.args = list(big.mark = ","), caption = paste("Industries with the Largest Changes in Closures from Pandemic to Post-Pandemic"), row.names = FALSE)
+knitr::kable(Largest_Pandemic_vs_Post, digits = 1, col.names = c("Industry", "Pandemic Closures", "Post-Pandemic Closures","Difference","Percent Change"), format.args = list(big.mark = ","), caption = paste("Industries with the Largest Changes in Closures from Pandemic to Post-Pandemic"), row.names = FALSE)
 ```
 
 ### Summary
 
-The first table displays the top 10 industries with the largest differences and percent changes between the Pre-Pandemic and Pandemic periods. The second table displays the top 10 industries with the largest differences and percent changes between the Pandemic and Post-Pandemic periods. Among business location with available industry classifications, "All other personal services" experienced the largest decrease in closures from the Pre-Pandemic period to the Pandemic, falling from 63 to 31. The same industry also had the largest increase in closures from the Pandemic to the Post-Pandemic period, rising from 31 to 71. Of the 10 industries shown in the first table, they all experienced a decrease in closures between the Pre-Pandemic period and the Pandemic. Of the 10 industries shown in the second table, they all experienced an increase in closures between the Pandemic and Post-Pandemic period. As mentioned above, this data only includes the observations that had non-missing NAICS codes and industry descriptions. With 98.7% of 234,761 observations missing those variables, 231,814 observations were removed, and only 2,947 observations were retained for analysis. Therefore, the tables provide a small description of the industry closure patterns and may not represent full industry closure patterns across all of Los Angeles.
+The first table displays the top 10 industries with the largest differences and percent changes between the Pre-Pandemic and Pandemic periods. The second table displays the top 10 industries with the largest differences and percent changes between the Pandemic and Post-Pandemic periods. The results were ranked in descending order and by absolute difference. Among business location with available industry classifications, "All other personal services" experienced the largest decrease in closures from the Pre-Pandemic period to the Pandemic, falling from 63 to 31. The same industry also had the largest increase in closures from the Pandemic to the Post-Pandemic period, rising from 31 to 71. Of the 10 industries shown in the first table, they all experienced a decrease in closures between the Pre-Pandemic period and the Pandemic. Of the 10 industries shown in the second table, they all experienced an increase in closures between the Pandemic and Post-Pandemic period. As mentioned above, this data only includes the observations that had non-missing NAICS codes and industry descriptions. With 98.7% of 234,761 observations missing those variables, 231,814 observations were removed, and only 2,947 observations were retained for analysis. Therefore, the tables provide a small description of the industry closure patterns and may not represent full industry closure patterns across all of Los Angeles.
 
 ## Follow-Up Question 2
 
-Which Los Angeles City districts experienced the largest percentage changes in business-location closures from the pre-pandemic period to the pandemic period and the pandemic period to the post-pandemic period?
+Which Los Angeles City districts experienced the largest changes in business-location closures from the pre-pandemic period to the pandemic period and the pandemic period to the post-pandemic period?
 
 ```{r}
 District_Counts <- as.data.frame.matrix(xtabs(~ COUNCIL.DISTRICT + Period, data = Closures_Adjusted))
 District_Counts$Council_District <- as.integer(rownames(District_Counts))
 rownames(District_Counts) <- NULL
 
+# Pre- vs Pandemic Table
 District_Counts$Pre_vs_Pandemic_Difference <- District_Counts$Pandemic - District_Counts$`Pre-Pandemic`
 
 District_Counts$Pre_vs_Pandemic_Percent <- ifelse(District_Counts$`Pre-Pandemic`>0, 100*( District_Counts$Pandemic / District_Counts$`Pre-Pandemic` - 1), NA)
 
+District_Pre_vs_Pandemic <- District_Counts[order(abs(District_Counts$Pre_vs_Pandemic_Difference), decreasing = TRUE),]
+District_Pre_vs_Pandemic <- head(District_Pre_vs_Pandemic,15)
+District_Pre_vs_Pandemic <- District_Pre_vs_Pandemic[, c("Council_District", "Pre-Pandemic", "Pandemic", "Pre_vs_Pandemic_Difference", "Pre_vs_Pandemic_Percent")]
+
+knitr::kable(District_Pre_vs_Pandemic, digits = 1, row.names = FALSE, col.names = c("Council District", "Pre-Pandemic Closures", "Pandemic Closures","Difference","Percent Change"), format.args = list(big.mark = ","), caption = paste("Council Districts with the Largest Changes from Pre-Pandemic to Pandemic"))
+
+
+# Pandemic vs. Post- Table
 District_Counts$Pandemic_vs_Post_Difference <- District_Counts$`Post-Pandemic` - District_Counts$Pandemic
 
 District_Counts$Pandemic_vs_Post_Percent <- ifelse(District_Counts$Pandemic > 0, 100 * (District_Counts$`Post-Pandemic` / District_Counts$Pandemic - 1), NA)
 
+District_Pandemic_vs_Post <- District_Counts[order(abs(District_Counts$Pandemic_vs_Post_Difference), decreasing = TRUE),]
+District_Pandemic_vs_Post <- head(District_Pandemic_vs_Post, 15)
+District_Pandemic_vs_Post <- District_Pandemic_vs_Post[, c("Council_District","Pandemic", "Post-Pandemic", "Pandemic_vs_Post_Difference", "Pandemic_vs_Post_Percent")]
+
+knitr::kable(District_Pandemic_vs_Post, digits = 1, row.names = FALSE, col.names = c("Council District", "Pandemic Closures", "Post-Pandemic Closures", "Difference", "Percent Change"), format.args = list(big.mark = ","), caption = paste("Council Districts with the Largest Changes from Pandemic to Post-Pandemic"))
 
 ```
+
+### Summary
+
+The results were ranked in descending order and by absolute difference. Between the Pre-Pandemic period and the pandemic, Council District 14 experienced the largest change in reported closures, with 3,291 fewer closures during the Pandemic. Council District 14 includes Downtown Los Angeles, Boyle Heights, El Sereno, Lincoln Heights, Highland Park, Eagle Rock, and Monterey Hills. All other districts also experienced fewer closures during the Pandemic. Between the Pandemic and Post-Pandemic period, Council District 5 experienced the largest change in reported closures, with 930 fewer closures in the Post-Pandemic period. This district includes Bel-Air, Beverlywood, Century City, and Carthay Circle. After the Pandemic, some districts did experience a increase in closures, with the largest increase occurring in Council District 9, with 357 more closures than the Pandemic. This district includes some of Downtown Los Angeles, University Park, Exposition Park, South Central, and South Park. It is worth noting that districts may contain different numbers of businesses, so these tables show where reported closures change the most and not where buisnesses faced the greatest risk of closure. 
+
+## Follow-Up Question 3
+
+Was the percentage of businesses-location closures that operated for one year or less higher during the pandemic than the pre- and post-pandemic periods?
+
+```{r}
+Duration <- Closures_Adjusted[!is.na(Closures_Adjusted$LOCATION.START.DATE),]
+Duration$Duration_Days <- as.numeric(Duration$LOCATION.END.DATE - Duration$LOCATION.START.DATE)
+Duration$Recently_Established <- Duration$Duration_Days <= 365
+
+Total_by_Period <- as.data.frame(table(Duration$Period))
+names(Total_by_Period) <- c("Period", "Closures_with_Start_Date")
+
+Recent_By_Period <- aggregate(as.integer(Recently_Established) ~ Period, data = Duration, FUN = sum)
+
+names(Recent_By_Period)[2] <- "Recently_Established_Closures"
+
+Recent_Summary <- merge(Total_by_Period, Recent_By_Period, by = "Period")
+Recent_Summary$Percent_Recently_Established <- 100 * (Recent_Summary$Recently_Established_Closures / Recent_Summary$Closures_with_Start_Date)
+
+knitr::kable(Recent_Summary, digits = 1)
+```
+
+
+## Follow-Up Question 4
+
+Did the operating duration of businesses that closed differ among the pre-pandemic, pandemic, and post-pandemic periods?
+
+## Follow-Up Question 5
+
+Which months had the largest numbers of reported closures within each period?
+
+## Follow-Up Question 6
+
+Did the variability of monthly closure counts differ across the three periods? Were business-location closures distributed seasonally?
+
+
 
 
 
