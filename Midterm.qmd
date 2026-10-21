@@ -203,7 +203,7 @@ Post_vs_Pandemic_Difference <-Counts["Post-Pandemic"] - Counts["Pandemic"]
 Post_vs_Pandemic_Percent <- 100 * (Counts["Post-Pandemic"] / Counts["Pandemic"] - 1)
 
 Comparison_Table <- data.frame(Comparison = c("Pre-Pandemic vs. Pandemic", "Pandemic vs. Post-Pandemic"), Earlier_Closures = c(unname(Counts["Pre-Pandemic"]), unname(Counts["Pandemic"])), Later_Closures = c(unname(Counts["Pandemic"]), unname(Counts["Post-Pandemic"])), Difference = c(unname(Pandemic_vs_Pre_Difference), unname(Post_vs_Pandemic_Difference)), Percent_Change = c(unname(Pandemic_vs_Pre_Percent), unname(Post_vs_Pandemic_Percent)))
-knitr::kable(Comparison_Table, col.names = c("Comparison", "Earlier Period Closures", "Later Period Closures", "Difference", "Percent Change"), caption = paste("Change in Business-Location Closures between Periods"))
+knitr::kable(Comparison_Table, digits = 2, format.args = list(big.mark = ","), col.names = c("Comparison", "Earlier Period Closures", "Later Period Closures", "Difference", "Percent Change"), caption = paste("Change in Business-Location Closures between Periods"))
 
 ```
 
@@ -233,7 +233,7 @@ Largest_Pre_vs_Pandemic <- Industry_Counts[order(abs(Industry_Counts$Pre_vs_Pand
 Largest_Pre_vs_Pandemic <- head(Largest_Pre_vs_Pandemic,10)
 Largest_Pre_vs_Pandemic <- Largest_Pre_vs_Pandemic[, c("Industry","Pre-Pandemic","Pandemic","Pre_vs_Pandemic_Difference","Pre_vs_Pandemic_Percent")]
 
-knitr::kable(Largest_Pre_vs_Pandemic, digits = 1, col.names = c("Industry", "Pre-Pandemic Closures", "Pandemic Closures", "Difference","Percent Change"), format.args = list(big.mark = ","), caption = paste("Industries with the Largest Changes in Closures from Pre-Pandemic to Pandemic"), row.names = FALSE)
+knitr::kable(Largest_Pre_vs_Pandemic, digits = 2, col.names = c("Industry", "Pre-Pandemic Closures", "Pandemic Closures", "Difference","Percent Change"), format.args = list(big.mark = ","), caption = paste("Industries with the Largest Changes in Closures from Pre-Pandemic to Pandemic"), row.names = FALSE)
 
 # Pandemic vs Post- Table
 Industry_Counts$Pandemic_vs_Post_Difference <- Industry_Counts$`Post-Pandemic` - Industry_Counts$Pandemic
@@ -244,7 +244,7 @@ Largest_Pandemic_vs_Post <- Industry_Counts[order(abs(Industry_Counts$Pandemic_v
 Largest_Pandemic_vs_Post <- head(Largest_Pandemic_vs_Post,10)
 Largest_Pandemic_vs_Post <- Largest_Pandemic_vs_Post[, c("Industry","Pandemic","Post-Pandemic","Pandemic_vs_Post_Difference","Pandemic_vs_Post_Percent")]
 
-knitr::kable(Largest_Pandemic_vs_Post, digits = 1, col.names = c("Industry", "Pandemic Closures", "Post-Pandemic Closures","Difference","Percent Change"), format.args = list(big.mark = ","), caption = paste("Industries with the Largest Changes in Closures from Pandemic to Post-Pandemic"), row.names = FALSE)
+knitr::kable(Largest_Pandemic_vs_Post, digits = 2, col.names = c("Industry", "Pandemic Closures", "Post-Pandemic Closures","Difference","Percent Change"), format.args = list(big.mark = ","), caption = paste("Industries with the Largest Changes in Closures from Pandemic to Post-Pandemic"), row.names = FALSE)
 ```
 
 ### Summary
@@ -252,6 +252,43 @@ knitr::kable(Largest_Pandemic_vs_Post, digits = 1, col.names = c("Industry", "Pa
 The first table displays the top 10 industries with the largest differences and percent changes between the Pre-Pandemic and Pandemic periods. The second table displays the top 10 industries with the largest differences and percent changes between the Pandemic and Post-Pandemic periods. The results were ranked in descending order and by absolute difference. Among business location with available industry classifications, "All other personal services" experienced the largest decrease in closures from the Pre-Pandemic period to the Pandemic, falling from 63 to 31. The same industry also had the largest increase in closures from the Pandemic to the Post-Pandemic period, rising from 31 to 71. Of the 10 industries shown in the first table, they all experienced a decrease in closures between the Pre-Pandemic period and the Pandemic. Of the 10 industries shown in the second table, they all experienced an increase in closures between the Pandemic and Post-Pandemic period. As mentioned above, this data only includes the observations that had non-missing NAICS codes and industry descriptions. With 98.7% of 234,761 observations missing those variables, 231,814 observations were removed, and only 2,947 observations were retained for analysis. Therefore, the tables provide a small description of the industry closure patterns and may not represent full industry closure patterns across all of Los Angeles.
 
 ## Follow-Up Question 2
+
+How were business-location closures spatially distributed across Los Angeles during all three periods?
+
+```{r district-map, warning = FALSE, message = FALSE}
+library(ggplot2)
+library(sf)
+
+Map_Data <- Closures_Adjusted[!is.na(Closures_Adjusted$LOCATION) & trimws(as.character(Closures_Adjusted$LOCATION)) != "", ]
+
+Clean_Locations <- gsub("[()]", "", trimws(as.character(Map_Data$LOCATION)))
+Coordinates <- do.call(rbind, strsplit(Clean_Locations, ","))
+Map_Data$Latitude <- as.numeric(trimws(Coordinates[,1]))
+Map_Data$Longitude <- as.numeric(trimws(Coordinates[,2]))
+
+Map_Points <- st_as_sf(Map_Data, coords = c("Longitude","Latitude"), crs = 4326, remove = FALSE)
+
+Council_Districts <- st_read(paste0("https://data.lacity.org/api/geospatial/pxeu-7j74?method=export&format=GeoJSON"), quiet = TRUE)
+Council_Districts <- st_transform(Council_Districts, crs = 4326)
+
+Council_Districts$District_Label <- as.integer(as.character(Council_Districts$name))
+District_Labels <- st_transform(Council_Districts, crs = 3857)
+District_Labels <- st_point_on_surface(District_Labels)
+District_Labels <- st_transform(District_Labels, crs = 4326)
+
+ggplot() +
+  geom_sf(data = Council_Districts, fill = "gray", color = "black") + 
+  geom_sf(data = Map_Points, color = "blue", size = 0.5, alpha = 0.3) +
+  coord_sf(xlim = c(-118.70, -118.15), ylim = c(33.70, 34.35), expand = FALSE) + 
+  geom_sf_text(data = District_Labels, aes(label = District_Label), color = "white", size = 5, fontface = "bold", check_overlap = TRUE) + 
+  labs(title = paste("Business-Location Closures in Los Angeles"), x = "Longitude", y = "Latitude")
+```
+
+### Summary
+
+About 98.7% of locations were missing, so this map only displays business-location closures with valid locations across all three periods. Compared to the official County District maps (https://culture.lacity.gov/council-districts-directory), closures appear concentrated in County Districts 1, 10, 13, and 14 which is the area with the dense amount of points. Council District 1 includes parts of Lincoln Heights, Koreatown, Cypress Park, and University Park. Council District 10 includes parts of Arlington Heights, Koreatown, Olympic Park, and West Pico. Council District 13 includes parts of Silver lake, Echo Park, Hollywood, East Hollywood, and Koreatown. Council District 14 includes parts of Downtown Los Angeles, Boyle Heights, Eagle Rock, Lincoln Heights, and Monterey Hills. 
+
+## Follow-Up Question 3
 
 Which Los Angeles City districts experienced the largest changes in business-location closures from the pre-pandemic period to the pandemic period and the pandemic period to the post-pandemic period?
 
@@ -269,7 +306,7 @@ District_Pre_vs_Pandemic <- District_Counts[order(abs(District_Counts$Pre_vs_Pan
 District_Pre_vs_Pandemic <- head(District_Pre_vs_Pandemic,15)
 District_Pre_vs_Pandemic <- District_Pre_vs_Pandemic[, c("Council_District", "Pre-Pandemic", "Pandemic", "Pre_vs_Pandemic_Difference", "Pre_vs_Pandemic_Percent")]
 
-knitr::kable(District_Pre_vs_Pandemic, digits = 1, row.names = FALSE, col.names = c("Council District", "Pre-Pandemic Closures", "Pandemic Closures","Difference","Percent Change"), format.args = list(big.mark = ","), caption = paste("Council Districts with the Largest Changes from Pre-Pandemic to Pandemic"))
+knitr::kable(District_Pre_vs_Pandemic, digits = 2, row.names = FALSE, col.names = c("Council District", "Pre-Pandemic Closures", "Pandemic Closures","Difference","Percent Change"), format.args = list(big.mark = ","), caption = paste("Council Districts with the Largest Changes from Pre-Pandemic to Pandemic"))
 
 
 # Pandemic vs. Post- Table
@@ -281,15 +318,37 @@ District_Pandemic_vs_Post <- District_Counts[order(abs(District_Counts$Pandemic_
 District_Pandemic_vs_Post <- head(District_Pandemic_vs_Post, 15)
 District_Pandemic_vs_Post <- District_Pandemic_vs_Post[, c("Council_District","Pandemic", "Post-Pandemic", "Pandemic_vs_Post_Difference", "Pandemic_vs_Post_Percent")]
 
-knitr::kable(District_Pandemic_vs_Post, digits = 1, row.names = FALSE, col.names = c("Council District", "Pandemic Closures", "Post-Pandemic Closures", "Difference", "Percent Change"), format.args = list(big.mark = ","), caption = paste("Council Districts with the Largest Changes from Pandemic to Post-Pandemic"))
+knitr::kable(District_Pandemic_vs_Post, digits = 2, row.names = FALSE, col.names = c("Council District", "Pandemic Closures", "Post-Pandemic Closures", "Difference", "Percent Change"), format.args = list(big.mark = ","), caption = paste("Council Districts with the Largest Changes from Pandemic to Post-Pandemic"))
 
+```
+
+```{r district-map, warning = FALSE, message = FALSE}
+Council_Districts$Council_District <- as.integer(as.character(Council_Districts$name))
+
+District_Map_Data <- merge(Council_Districts, District_Counts, by = "Council_District", all.x = TRUE)
+
+Map_Limit <- max(abs(District_Map_Data$Pre_vs_Pandemic_Difference), abs(District_Map_Data$Pandemic_vs_Post_Difference), na.rm = TRUE)
+
+ggplot(District_Map_Data) + 
+  geom_sf(aes(fill = Pre_vs_Pandemic_Difference), color = "white") +
+  geom_sf_text(aes(label = Council_District), color = "black") +
+  scale_fill_gradient2(low="red", mid = "white", high = "blue", limits = c(-Map_Limit, Map_Limit), name = "Change in Closures") +
+  labs(title= paste("Change in Business-Location Closures from Pre-Pandemic to Pandemic"), x = "Longitude", y = "Latitude")
+
+ggplot(District_Map_Data) + 
+  geom_sf(aes(fill = Pandemic_vs_Post_Difference), color = "white") +
+  geom_sf_text(aes(label = Council_District), color = "black") +
+  scale_fill_gradient2(low="red", mid = "white", high = "blue", limits = c(-Map_Limit, Map_Limit), name = "Change in Closures") +
+  labs(title= paste("Change in Business-Location Closures from Pandemic to Post-Pandemic"), x = "Longitude", y = "Latitude")
 ```
 
 ### Summary
 
-The results were ranked in descending order and by absolute difference. Between the Pre-Pandemic period and the pandemic, Council District 14 experienced the largest change in reported closures, with 3,291 fewer closures during the Pandemic. Council District 14 includes Downtown Los Angeles, Boyle Heights, El Sereno, Lincoln Heights, Highland Park, Eagle Rock, and Monterey Hills. All other districts also experienced fewer closures during the Pandemic. Between the Pandemic and Post-Pandemic period, Council District 5 experienced the largest change in reported closures, with 930 fewer closures in the Post-Pandemic period. This district includes Bel-Air, Beverlywood, Century City, and Carthay Circle. After the Pandemic, some districts did experience a increase in closures, with the largest increase occurring in Council District 9, with 357 more closures than the Pandemic. This district includes some of Downtown Los Angeles, University Park, Exposition Park, South Central, and South Park. It is worth noting that districts may contain different numbers of businesses, so these tables show where reported closures change the most and not where buisnesses faced the greatest risk of closure. 
+The results were ranked in descending order and by absolute difference. Between the Pre-Pandemic period and the pandemic, Council District 14 experienced the largest change in reported closures, with 3,291 fewer closures during the Pandemic. Council District 14 includes Downtown Los Angeles, Boyle Heights, El Sereno, Lincoln Heights, Highland Park, Eagle Rock, and Monterey Hills. All other districts also experienced fewer closures during the Pandemic. Between the Pandemic and Post-Pandemic period, Council District 5 experienced the largest change in reported closures, with 930 fewer closures in the Post-Pandemic period. This district includes Bel-Air, Beverlywood, Century City, and Carthay Circle. After the Pandemic, some districts did experience a increase in closures, with the largest increase occurring in Council District 9, with 357 more closures than the Pandemic. This district includes some of Downtown Los Angeles, University Park, Exposition Park, South Central, and South Park. It is worth noting that districts may contain different numbers of businesses, so these tables show where reported closures change the most and not where businesses faced the greatest risk of closure. 
 
-## Follow-Up Question 3
+The accompanying maps display the same information as the tables. Red districts experienced a decrease in closures while blue districts experienced an increase in closures, and, the darker the color, the larger the change in closures. The map of the Pre-Pandemic vs. Pandemic periods shows that Council District 14 had the largest decrease in closures  and that all the districts experienced decreases in closures between the two periods. The map of the Pandemic vs. Post-Pandemic shows that Council District 5 had the largest decrease in closures and that Council District 9 had the largest increase in closures between the two periods. 
+
+## Follow-Up Question 4
 
 Was the percentage of businesses-location closures that operated for one year or less higher during the pandemic than the pre- and post-pandemic periods?
 
@@ -307,24 +366,36 @@ names(Recent_By_Period)[2] <- "Recently_Established_Closures"
 
 Recent_Summary <- merge(Total_by_Period, Recent_By_Period, by = "Period")
 Recent_Summary$Percent_Recently_Established <- 100 * (Recent_Summary$Recently_Established_Closures / Recent_Summary$Closures_with_Start_Date)
+Recent_Summary$Period <- factor(Recent_Summary$Period, levels = c("Pre-Pandemic","Pandemic","Post-Pandemic"))
+Recent_Summary <- Recent_Summary[order(Recent_Summary$Period),]
 
-knitr::kable(Recent_Summary, digits = 1)
+knitr::kable(Recent_Summary, digits = 2, row.names = FALSE, col.names = c("Period", "Closures", "Closed within One Year", "Percentage"), format.args = list(big.mark = ","), caption = paste("Recently Established Buisness Closures by Period"))
+
+barplot(Recent_Summary$Percent_Recently_Established, names.arg = Recent_Summary$Period, col = c("blue", "red", "green"), xlab = "Period", ylab = "Percent of Closures", main = paste("Percentage of Closures of Business Locations Established within One Year by Period"), ylim =c(0,6))
 ```
 
+### Summary
 
-## Follow-Up Question 4
+Recently established business locations were less common during the Pandemic than during the Pre-Pandemic period. Recently established business locations accounted for 5.88% of Pre-Pandemic closures, 4.04% of Pandemic closures, and 2.26% of Post-Pandemic closures. Therefore, the proportion of recently established business location closures declined during the Pandemic and continued to decline afterward. These findings are based off of business location closures with valid start dates and do not show that recently established businesses had a lower risk of closing, as businesses that remained open were not included in the analysis.
 
-Did the operating duration of businesses that closed differ among the pre-pandemic, pandemic, and post-pandemic periods?
+
+
+
+
+
+
 
 ## Follow-Up Question 5
 
-Which months had the largest numbers of reported closures within each period?
+Did the operating duration of businesses that closed differ among the pre-pandemic, pandemic, and post-pandemic periods?
 
 ## Follow-Up Question 6
 
+Which months had the largest numbers of reported closures within each period?
+
+## Follow-Up Question 7
+
 Did the variability of monthly closure counts differ across the three periods? Were business-location closures distributed seasonally?
-
-
 
 
 
