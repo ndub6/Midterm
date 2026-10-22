@@ -439,7 +439,7 @@ knitr::kable(ZIP_Pandemic_vs_Post, row.names = FALSE, col.names = c("ZIP Code", 
 
 The first table contains the top ten ZIP codes with the largest absolute changes in business-location closures from the Pre-Pandemic period to the Pandemic. All ten experienced the declines in closures. ZIP code 91331 had the largest change, decreasing from 1,747 closures during the Pre-Pandemic period to 866 during the Pandemic. ZIP code 91331, covers Pacoima and parts of Arleta, overlapping with Council Districts 6 and 7.
 
-The second table contains the top ten ZIP codes with the largest absolute changes in business-location closures from the Pandemic to the Post-Pandemic period. Six ZIP codes experienced increases and four ZIP codes experienced decreases. ZIP code 90014 had the largest increase in closures, rising from 670 to 872 closures. This ZIP code covers some of Downtown Los Angeles, putting it within Council District 14. ZIP code 90049 had the largest decrease in closures, declining from 951 to 758 closures. This ZIP code covers parts of Brentwood,putting it within Council District 11. 
+The second table contains the top ten ZIP codes with the largest absolute changes in business-location closures from the Pandemic to the Post-Pandemic period. Six ZIP codes experienced increases and four ZIP codes experienced decreases. ZIP code 90014 had the largest increase in closures, rising from 670 to 872 closures. This ZIP code covers some of Downtown Los Angeles, putting it within Council District 14. ZIP code 90049 had the largest decrease in closures, declining from 951 to 758 closures. This ZIP code covers parts of Brentwood, putting it within Council District 11. 
 
 ## Follow-Up Question 5
 
