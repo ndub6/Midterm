@@ -24,9 +24,9 @@ The "Listing of All Businesses" dataset was obtained from the City of Los Angele
 
 An initial data frame, "Closures," was created to retain historical closure records. Date-based periods were created, with "Pre-Pandemic" referring to any location end date prior to March 11, 2020. "Pandemic" refers to any location end date between March 11, 2020 and May 5, 2023. "Post-Pandemic" refers to any location end date after May 5, 2023. Future location end dates, those that have not happened yet, were removed from the "Closures" data frame. The cutoff date for this was set as October 15, 2026, the date this dataset was downloaded.
 
-Acknowledging that the "Pre-Pandemic" category extends all the way back to 1977, a second data frame was created, "Closures_Adjusted." Here, periods were restricted to 1,151 days, which was the length of the Pandemic. "Pre-Pandemic was defined as any location end date between January 15, 2017 and March 10, 2020. "Post-Pandemic was defined as any location end date between May 6, 2023 and June 29, 2026. "Pandemic" was unchanged. Equal-length periods will make closure counts more comparable. "Closures" will be included in the Exploratory Analysis section, while "Closures_Adjusted" will be used for to answer the primary question and follow-up questions. For potential follow up questions, "Closure Month," "Closure Year," and "Closure.Month.Date" variables were created.
+Acknowledging that the "Pre-Pandemic" category extends all the way back to 1977, a second data frame was created, "Closures_Adjusted." Here, periods were restricted to 1,151 days, which was the length of the Pandemic. "Pre-Pandemic was defined as any location end date between January 15, 2017 and March 10, 2020. "Post-Pandemic was defined as any location end date between May 6, 2023 and June 29, 2026. "Pandemic" was unchanged. Equal-length periods will make closure counts more comparable. "Closures" will be included in the Exploratory Analysis section, while "Closures_Adjusted" will be used to answer the primary question and follow-up questions. For potential follow up questions, "Closure Month," "Closure Year," and "Closure.Month.Date" variables were created.
 
-References
+References:
 
 1.  https://geohub.lacity.org/datasets/lahub::zip-codes-la-county/about
 
@@ -102,14 +102,13 @@ Missing_NAICS <- is.na(Closures_Adjusted$NAICS) | trimws(Closures_Adjusted$NAICS
 Table <- data.frame(Characteristic = c("Business-Location Closures", "Earliest Closure Date", "Latest Closure Date", "Unique Location Accounts", "Unique Business Name", "Missing NAICS Codes", "Missing Industry Descriptions", "Missing Locations"), Value = c(format(nrow(Closures_Adjusted), big.mark = ","), format(min(Closures_Adjusted$LOCATION.END.DATE, na.rm = TRUE)), format(max(Closures_Adjusted$LOCATION.END.DATE, na.rm = TRUE)), format(length(unique(Closures_Adjusted$LOCATION.ACCOUNT..)), big.mark = ","), format(length(unique(Closures_Adjusted$BUSINESS.NAME)), big.mark = ","), paste0(format(sum(Missing_Industry),big.mark = ",")," (",round(100 * mean(Missing_Industry),1),"%)"),paste0(format(sum(Missing_Location),big.mark = ",")," (",round(100 * mean(Missing_Location),1),"%)"),paste0(format(sum(Missing_NAICS),big.mark = ",")," (",round(100 * mean(Missing_NAICS),1),"%)")))
 
 knitr::kable(Table, col.names = c("Dataset Characteristic", "Value"), caption = "Business Closure Characteristics (Adjusted Data)")
-
 ```
 
 ### Explanation
 
 The Historic Data table reveals that there were a total of 648,311 closures between November 14, 1977 and October 14, 2026, which was the latest closure at the time this data was downloaded. Given that each business location gets a unique location account, it makes sense that the number of unique location accounts matches the number of business-location closures. Of the closures, 590,629 had unique business names, suggesting that some business names were associated with multiple locations. However, variation in business names was not accounted for, so business names alone cannot determine the exact number of unique businesses. Approximately 99% of the NAICS codes, industry descriptions, and locations were missing. While this won't affect the primary analysis, this may limit follow-up question analyses.
 
-The Adjusted Data table reveals that there were a total of 234,605 closures between January 15, 2017 and June 29, 2026. Again, given that each business location gets a unique location account, it makes sense that the number of unique location accounts matches the number of business-location closures. There were 220,944 unique business names, but again, variation in business names were not accounted for, so this value should not be interpreted as the exact number of unique business. 98.7% of the NAICS codes, industry descriptions, and locations were missing. Again, this may limit follow-up question analyses.
+The Adjusted Data table reveals that there were a total of 234,605 closures between January 15, 2017 and June 29, 2026. Again, given that each business location gets a unique location account, it makes sense that the number of unique location accounts matches the number of business-location closures. There were 220,944 unique business names, but again, variation in business names were not accounted for, so this value should not be interpreted as the exact number of unique businesses. 98.7% of the NAICS codes, industry descriptions, and locations were missing. Again, this may limit follow-up question analyses.
 
 ## Annual Business-Location Closures (Historic and Adjusted Data)
 
@@ -140,9 +139,9 @@ barplot(Yearly_Closures$Closures, names.arg = Yearly_Closures$Year, las = 2, col
 
 ### Explanation
 
-The annual distribution of the Historic Data indicates that closure data before the 2000's are relatively sparse, though, this could be because of limited reporting or data availability. Prominent peaks in closures occurred in 2004, 2013, and 2017, which may warrant further investigation to determine if they represent drastic changes in closures, reporting patterns, or some other reason. As stated on the barplot, 1977 and 2026 are incomplete years. the 1977 records begin on November 14, 1977 and the 2026 records end on October 14, 2026. Their closures should not be directly compared to the closures of complete years.
+The annual distribution of the Historic Data indicates that closure data before the 2000s are relatively sparse, though, this could be because of limited reporting or data availability. Prominent peaks in closures occurred in 2004, 2013, and 2017, which may warrant further investigation to determine if they represent drastic changes in closures, reporting patterns, or some other reason. As stated on the barplot, 1977 and 2026 are incomplete years. The 1977 records begin on November 14, 1977 and the 2026 records end on October 14, 2026. Their closures should not be directly compared to the closures of complete years.
 
-The annual distribution of the Adjusted Data covers the equal length, 1,151-day Pre-Pandemic, Pandemic, and Post-Pandemic periods. This barplot does not show separate study periods, rather, it shows complete calendar-year closure totals. This means that there is some overlap between the periods in 2020 (Pre-Pandemic and Pandemic) and 2023 (Pandemic and Post-Pandemic). The prominent peak in 2017 is still present in this data. As stated, 2017 and 2026 are incomplete years. 2017 begins on January 15, 2017 and 2026 ends on June 29, 2026. Their closures should not be directly compared to the closures of complete years.
+The annual distribution of the Adjusted Data covers the equal-length, 1,151-day Pre-Pandemic, Pandemic, and Post-Pandemic periods. This barplot does not show separate study periods, rather, it shows complete calendar-year closure totals. This means that there is some overlap between the periods in 2020 (Pre-Pandemic and Pandemic) and 2023 (Pandemic and Post-Pandemic). The prominent peak in 2017 is still present in this data. As stated, 2017 and 2026 are incomplete years. 2017 begins on January 15, 2017 and 2026 ends on June 29, 2026. Their closures should not be directly compared to the closures of complete years.
 
 ## Monthly Business-Location Closures (Historic and Adjusted Data)
 
@@ -184,7 +183,7 @@ knitr::kable(Largest_Month, col.names = c("Closure Month", "Number of Closures")
 
 ### Explanation
 
-The monthly distribution of the Historic Data shows greater variation in closures over time than the annual distribution. Like the annual distribution, data before the 2000's is relatively sparse. The monthly distribution reveals more pronounced peaks, which may suggest that the peaks in the annual distribution come from a large amount of closures in certain months rather than high amounts of closures throughout the entire year. The highest monthly peak in closures occurs in November 2004, with 41,575 closures.
+The monthly distribution of the Historic Data shows greater variation in closures over time than the annual distribution. Like the annual distribution, data before the 2000s is relatively sparse. The monthly distribution reveals more pronounced peaks, which may suggest that the peaks in the annual distribution come from a large amount of closures in certain months rather than high amounts of closures throughout the entire year. The highest monthly peak in closures occurred in November 2004, with 41,575 closures.
 
 The monthly distribution of the Adjusted Data provides a more detailed view of closures across the three periods. Prominent peaks occur in the Pre-Pandemic period. Monthly closures appear lower during the Pandemic, and remain relatively low during the Post-Pandemic period except for one peak at sometime in 2024. The highest monthly peak in closures occurs in March 2017, with 14,993 closures.
 
@@ -239,7 +238,7 @@ text(x = Bar_Positions, y = Results$Closures, labels = Bar_Labels, pos = 3)
 
 ### Summary
 
-To answer the primary question, I used the Adjusted Data table, as it includes three equal length periods of 1,151 days, allowing their business-location closure counts to be compared directly. The Pre-Pandemic period had 100,854 closures, representing 42.99% of all closures. The Pandemic had 66,954 closures (28.54%) and the Post-Pandemic period had 66.797 closures (28.47%). The number of business-location closures decreased by 33,900, or 33.61%, from the Pre-Pandemic period to the Pandemic period. Mean daily closures had a similar decrease across these periods, going from 87.62 to 58.17. The number of business-location closures decreased by only 157, or 0.23%, from the Pandemic to the Post-Pandemic period. Mean daily closures barely decreased from 58.17 to 58.03. Therefore, business-location closures declined substantially during the Pandemic and remained relatively unchanged afterward. The accompanying barplot visually summarizes these results.
+To answer the primary question, I used the Adjusted Data table, as it includes three equal-length periods of 1,151 days, allowing their business-location closure counts to be compared directly. The Pre-Pandemic period had 100,854 closures, representing 42.99% of all closures. The Pandemic had 66,954 closures (28.54%) and the Post-Pandemic period had 66.797 closures (28.47%). The number of business-location closures decreased by 33,900, or 33.61%, from the Pre-Pandemic period to the Pandemic period. Mean daily closures had a similar decrease across these periods, going from 87.62 to 58.17. The number of business-location closures decreased by only 157, or 0.23%, from the Pandemic to the Post-Pandemic period. Mean daily closures barely decreased from 58.17 to 58.03. Therefore, business-location closures declined substantially during the Pandemic and remained relatively unchanged afterward. The accompanying barplot visually summarizes these results.
 
 ## Follow-Up Question 1
 
@@ -281,15 +280,15 @@ knitr::kable(Largest_Pandemic_vs_Post, digits = 2, col.names = c("Industry", "Pa
 
 The first table displays the top ten industries with the largest absolute changes in closures between the Pre-Pandemic period and Pandemic. The second table displays the top ten industries with the largest absolute changes between the Pandemic and Post-Pandemic period. percentage changes are included to show the size of each change relative to the earlier period. The results were ranked according to the absolute difference in closure counts.
 
-Among business location with available NAICS codes and industry descriptions, "All other personal services" experienced the largest decrease in closures from the Pre-Pandemic period to the Pandemic, declining from 63 to 31, a decrease of 50.79%. This same industry also had the largest increase in closures from the Pandemic to the Post-Pandemic period, rising from 31 to 71, an increase of 129.03%. All ten of the largest absolute changes between the Pre-Pandemic period and Pandemic were decreases. Conversely, all ten of the largest absolute changes between the Pandemic and Post-Pandemic period were increases.
+Among business-locations with available NAICS codes and industry descriptions, "All other personal services" experienced the largest decrease in closures from the Pre-Pandemic period to the Pandemic, declining from 63 to 31, a decrease of 50.79%. This same industry also had the largest increase in closures from the Pandemic to the Post-Pandemic period, rising from 31 to 71, an increase of 129.03%. All ten of the largest absolute changes between the Pre-Pandemic period and Pandemic were decreases. Conversely, all ten of the largest absolute changes between the Pandemic and Post-Pandemic period were increases.
 
-This analysis included only those records with non-missing NAICS codes and industry descriptions. Of the 234,605 records in the Adjusted Data, approximately 98.7% were excluded, leaving only 2,943 records for this analysis. Therefore, these tables provide a samll description of the industry closure patterns and may not represent full industry closures patterns across Los Angeles.
+This analysis included only those records with non-missing NAICS codes and industry descriptions. Of the 234,605 records in the Adjusted Data, approximately 98.7% were excluded, leaving only 2,943 records for this analysis. Therefore, these tables provide a small description of the industry closure patterns and may not represent full industry closures patterns across Los Angeles.
 
 ## Follow-Up Question 2
 
 How were business-location closures spatially distributed across Los Angeles over all three periods? How were business-location closures spatially distributed across Los Angeles for each period?
 
-```{r district-map, warning = FALSE, message = FALSE}
+```{r warning = FALSE, message = FALSE}
 library(ggplot2)
 library(sf)
 
@@ -318,7 +317,7 @@ ggplot() +
   labs(title = paste("Business-Location Closures by Council District"), x = "Longitude", y = "Latitude")
 ```
 
-```{r district-map, warning = FALSE, message = FALSE}
+```{r warning = FALSE, message = FALSE}
 Pre_Map <- Map_Points[Map_Points$Period == "Pre-Pandemic",]
 Pandemic_Map <- Map_Points[Map_Points$Period == "Pandemic",]
 Post_Map <- Map_Points[Map_Points$Period == "Post-Pandemic",]
@@ -347,9 +346,13 @@ ggplot() +
 
 ### Summary
 
-The combined map displays business-location closures by council district across all three periods. In other words, it is a map that combines all closures over time, rather than separating into each period. Approximately 98.7% of location values were missing, so this map only displays business-location closures with valid locations across all three periods. Compared to the official Council District map (https://culture.lacity.gov/council-districts-directory), closures appear concentrated in Council Districts 1, 10, 13, and 14 which is the area with the dense amount of points. Council District 1 includes parts of Lincoln Heights, Koreatown, Cypress Park, and University Park. Council District 10 includes parts of Arlington Heights, Koreatown, Olympic Park, and West Pico. Council District 13 includes parts of Silver lake, Echo Park, Hollywood, East Hollywood, and Koreatown. Council District 14 includes parts of Downtown Los Angeles, Boyle Heights, Eagle Rock, Lincoln Heights, and Monterey Hills.
+The combined map displays business-location closures by council district across all three periods. In other words, it is a map that combines all closures over time, rather than separating into each period. Approximately 98.7% of location values were missing, so this map only displays business-location closures with valid locations across all three periods. Compared to the official Council District map, closures appear concentrated in Council Districts 1, 10, 13, and 14 which is the area with the dense amount of points. Council District 1 includes parts of Lincoln Heights, Koreatown, Cypress Park, and University Park. Council District 10 includes parts of Arlington Heights, Koreatown, Olympic Park, and West Pico. Council District 13 includes parts of Silver Lake, Echo Park, Hollywood, East Hollywood, and Koreatown. Council District 14 includes parts of Downtown Los Angeles, Boyle Heights, Eagle Rock, Lincoln Heights, and Monterey Hills.
 
-The period-specific maps provide a clearer view of the spatial distribution of closures over time. During the Pre-Pandemic period, closures appear concentrated in Council Districts 1, 10, 13, and 14. The Pandemic map shows that closures concentrated in Council Districts 10 and 14. The Post-Pandemic period map shows that closures concentrated in Council Districts 1, 10, 11, 13, and 14. Council District 11 includes Bentwood, Del Rey, Mar Vista, Pacific Palisades, and Venice.
+The period-specific maps provide a clearer view of the spatial distribution of closures over time. During the Pre-Pandemic period, closures appear concentrated in Council Districts 1, 10, 13, and 14. The Pandemic map shows that closures concentrated in Council Districts 10 and 14. The Post-Pandemic period map shows that closures concentrated in Council Districts 1, 10, 11, 13, and 14. Council District 11 includes Brentwood, Del Rey, Mar Vista, Pacific Palisades, and Venice.
+
+References:
+
+1. https://culture.lacity.gov/council-districts-directory
 
 ## Follow-Up Question 3
 
@@ -385,7 +388,7 @@ knitr::kable(District_Pandemic_vs_Post, digits = 2, row.names = FALSE, col.names
 
 ```
 
-```{r district-map, warning = FALSE, message = FALSE}
+```{r warning = FALSE, message = FALSE}
 Council_Districts$Council_District <- as.integer(as.character(Council_Districts$name))
 
 District_Map_Data <- merge(Council_Districts, District_Counts, by = "Council_District", all.x = TRUE)
@@ -407,9 +410,9 @@ ggplot(District_Map_Data) +
 
 ### Summary
 
-The tables rank all Council Districts according to the absolute change in business-location closures between consecutive periods. From the Pre-Pandemic period to the Pandemic, Council District 14 experienced the largest absolute change. Its closures decreased from 9,713 to 6,429, a decrease in 3,284 closures (a 33.81% decrease). Every other Council District also recorded fewer closures during the Pandemic period. Council District 14 includes parts of Downtown Los Angeles, Boyle Heights, Eagle Rock, Lincoln Heights, and Monterey Hills. From the Pandemic to the Post-Pandemic period, Council District 5 experienced the largest absolute change. Its closures decreased from 7,744 to 6,813, a decrease in 931 closures (a 12.02% decrease). This district includes Bel-Air, Beverlywood, Century City, and Carthay Circle. Some districts did experience an increase in closures in the Post-Pandemic period, with the largest increase occuring in Council District 9. Here, closures increased from 1,974 to 2,330, an increase of 356 closures (a 18.03% increase). This district includes some of Downtown Los Angeles, University Park, Exposition Park, South Central, and South Park.
+The tables rank all Council Districts according to the absolute change in business-location closures between consecutive periods. From the Pre-Pandemic period to the Pandemic, Council District 14 experienced the largest absolute change. Its closures decreased from 9,713 to 6,429, a decrease in 3,284 closures (a 33.81% decrease). Every other Council District also recorded fewer closures during the Pandemic period. Council District 14 includes parts of Downtown Los Angeles, Boyle Heights, Eagle Rock, Lincoln Heights, and Monterey Hills. From the Pandemic to the Post-Pandemic period, Council District 5 experienced the largest absolute change. Its closures decreased from 7,744 to 6,813, a decrease in 931 closures (a 12.02% decrease). This district includes Bel Air, Beverlywood, Century City, and Carthay Circle. Some districts did experience an increase in closures in the Post-Pandemic period, with the largest increase occurring in Council District 9. Here, closures increased from 1,974 to 2,330, an increase of 356 closures (a 18.03% increase). This district includes some of Downtown Los Angeles, University Park, Exposition Park, South Central, and South Park.
 
-The accompanying maps display the changes geographically. Red represents a decrease in closures while blue represents an increase in closures. The darker the color, the greater the magnitude of change. The Pre-Pandemic vs. Pandemic map periods shows that all districts experienced decreases in closures, and that Council District 14 had the largest decrease between the two periods. The Pandemic vs. Post-Pandemic map shows that Council District 5 had the largest decrease in closures and that Council District 9 had the largest increase in closures between the two periods.
+The accompanying maps display the changes geographically. Red represents a decrease in closures while blue represents an increase in closures. The darker the color, the greater the magnitude of change. The Pre-Pandemic vs. Pandemic map shows that all districts experienced decreases in closures, and that Council District 14 had the largest decrease between the two periods. The Pandemic vs. Post-Pandemic map shows that Council District 5 had the largest decrease in closures and that Council District 9 had the largest increase in closures between the two periods.
 
 ## Follow-Up Question 4
 
@@ -437,13 +440,13 @@ knitr::kable(ZIP_Pandemic_vs_Post, row.names = FALSE, col.names = c("ZIP Code", 
 
 ### Summary
 
-The first table contains the top ten ZIP codes with the largest absolute changes in business-location closures from the Pre-Pandemic period to the Pandemic. All ten experienced the declines in closures. ZIP code 91331 had the largest change, decreasing from 1,747 closures during the Pre-Pandemic period to 866 during the Pandemic. ZIP code 91331, covers Pacoima and parts of Arleta, overlapping with Council Districts 6 and 7.
+The first table contains the top ten ZIP codes with the largest absolute changes in business-location closures from the Pre-Pandemic period to the Pandemic. All ten experienced declines in closures. ZIP code 91331 had the largest change, decreasing from 1,747 closures during the Pre-Pandemic period to 866 during the Pandemic. ZIP code 91331, covers Pacoima and parts of Arleta, overlapping with Council Districts 6 and 7.
 
 The second table contains the top ten ZIP codes with the largest absolute changes in business-location closures from the Pandemic to the Post-Pandemic period. Six ZIP codes experienced increases and four ZIP codes experienced decreases. ZIP code 90014 had the largest increase in closures, rising from 670 to 872 closures. This ZIP code covers some of Downtown Los Angeles, putting it within Council District 14. ZIP code 90049 had the largest decrease in closures, declining from 951 to 758 closures. This ZIP code covers parts of Brentwood, putting it within Council District 11.
 
 ## Follow-Up Question 5
 
-Was the percentage of businesses-location closures that operated for one year or less ("recently established") higher during the Pandemic than the Pre- and Post-Pandemic periods?
+Was the percentage of business-location closures that operated for one year or less ("recently established") higher during the Pandemic than the Pre- and Post-Pandemic periods?
 
 ```{r}
 Duration <- Closures_Adjusted[!is.na(Closures_Adjusted$LOCATION.START.DATE),]
@@ -500,9 +503,9 @@ The largest monthly business-location closures during the Pre-Pandemic period oc
 
 How did the variability of monthly closure counts differ across the three periods?
 
-For this question, the partial months of January 2017, March 2020,, May 2023, and June 2026 were removed, as they do not contain a complete month of observations within their assigned periods. Including these months could possibly lower monthly closure counts and distort variability measures. 
+For this question, the partial months of January 2017, March 2020, May 2023, and June 2026 were removed, as they do not contain a complete month of observations within their assigned periods. Including these months could possibly lower monthly closure counts and distort variability measures. 
 
-```{r period-summary, echo=FALSE, message=FALSE, warning=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 Monthly_Mean <- aggregate(Closures ~ Period, data = Monthly_Closures, FUN = mean)
 
 Monthly_Median <- aggregate(Closures ~ Period, data = Monthly_Closures, FUN = median)
@@ -541,6 +544,6 @@ Additional analyses revealed variation across industries and geographic areas. O
 
 These findings describe the changes in reported closures, but do not show that the Pandemic caused them. Missing information in the original dataset, possible changes in reporting procedures, and the exclusion of active businesses limit the conclusions that can be made. Nonetheless, the analysis shows that the number of reported business-location closures was lower during and after the Pandemic than during the Pre-Pandemic period. Along with that, closure patterns varied across industries, time, and geographic areas.
 
-References
+References:
 
 1. https://www.naics.com/naics-code-description/?code=812990&v=2022
